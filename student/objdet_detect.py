@@ -152,7 +152,6 @@ def create_model(configs):
         print("student task ID_S3_EX1-4")
         num_layers = 18
         model = fpn_resnet.get_pose_net(num_layers, configs.heads, configs.head_conv, configs.imagenet_pretrained)
-        print("created model: ", model)
         #######
         ####### ID_S3_EX1-4 END #######     
     
@@ -208,7 +207,6 @@ def detect_objects(input_bev_maps, model, configs):
                                 outputs['dim'], configs.K)
             detections = detections.cpu().numpy().astype(np.float32)
             detections = post_processing(detections, configs)
-
             detections = detections[0][1]
             print (f"detections: {detections}") 
             #######

@@ -81,8 +81,6 @@ def show_range_image(frame, lidar_name):
     range_ch = ri[:,:,0]
     intensity_ch = ri[:,:,1]
     # step 3 : set values <0 to zero
-    #range_ch[range_ch<0] = 0.0
-    #intensity_ch[intensity_ch<0] = 0.0
     ri[ri<0]=0.0
     
     # step 4 : map the range channel onto an 8-bit scale and make sure that the full range of values is appropriately considered
@@ -103,9 +101,7 @@ def show_range_image(frame, lidar_name):
     img_intensity = img_intensity[:, ri_center - deg : ri_center + deg]
 
     # step 6 : stack the range and intensity image vertically using np.vstack and convert the result to an unsigned 8-bit integer
-
     img_range_intensity = np.vstack((img_range, img_intensity)).astype(np.uint8)
-    print(img_range_intensity[:,0])
 
     #######
     ####### ID_S1_EX1 END #######     
@@ -229,5 +225,3 @@ def bev_from_pcl(lidar_pcl, configs):
     bev_maps = torch.from_numpy(bev_maps)  # create tensor from birds-eye view
     input_bev_maps = bev_maps.to(configs.device, non_blocking=True).float()
     return input_bev_maps
-
-
