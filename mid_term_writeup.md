@@ -50,3 +50,6 @@
 
 > Identify vehicle features that appear stable in most of the inspected examples and describe them
 
+In most of the examples, common features are: wheels, windows, bumper, wing mirrors, windshield, side doors, car roof.
+
+
