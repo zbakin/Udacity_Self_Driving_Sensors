@@ -38,11 +38,9 @@ def measure_detection_performance(detections, labels, labels_valid, min_iou=0.5)
     true_positives = 0 # no. of correctly detected objects
     center_devs = []
     ious = []
-    count_valid = 0
     for label, valid in zip(labels, labels_valid):
         matches_lab_det = []
         if valid: # exclude all labels from statistics which are not considered valid
-            count_valid += 1
             # compute intersection over union (iou) and distance between centers
 
             ####### ID_S4_EX1 START #######     
@@ -88,7 +86,8 @@ def measure_detection_performance(detections, labels, labels_valid, min_iou=0.5)
     # compute positives and negatives for precision/recall
 
     ## step 1 : compute the total number of positives present in the scene
-    all_positives = count_valid
+    all_positives = labels_valid.sum()
+    true_positives=len(ious)
     ## step 2 : compute the number of false negatives
     false_negatives = all_positives - true_positives
     ## step 3 : compute the number of false positives
