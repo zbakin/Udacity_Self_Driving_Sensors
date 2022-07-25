@@ -30,30 +30,30 @@ class Track:
         
         ############
         # TODO Step 2: initialization:
-        # - replace fixed track initialization values by initialization of x and P based on 
+        # - replace fixed track initialization values by initialization of x and P based on
         # unassigned measurement transformed from sensor to vehicle coordinates
         # - initialize track state and track score with appropriate values
         ############
 
-        self.x = np.matrix([[49.53980697],
-                        [ 3.41006279],
-                        [ 0.91790581],
-                        [ 0.        ],
-                        [ 0.        ],
-                        [ 0.        ]])
-        self.P = np.matrix([[9.0e-02, 0.0e+00, 0.0e+00, 0.0e+00, 0.0e+00, 0.0e+00],
-                        [0.0e+00, 9.0e-02, 0.0e+00, 0.0e+00, 0.0e+00, 0.0e+00],
-                        [0.0e+00, 0.0e+00, 6.4e-03, 0.0e+00, 0.0e+00, 0.0e+00],
-                        [0.0e+00, 0.0e+00, 0.0e+00, 2.5e+03, 0.0e+00, 0.0e+00],
-                        [0.0e+00, 0.0e+00, 0.0e+00, 0.0e+00, 2.5e+03, 0.0e+00],
-                        [0.0e+00, 0.0e+00, 0.0e+00, 0.0e+00, 0.0e+00, 2.5e+01]])
-        self.state = 'confirmed'
-        self.score = 0
-        
-        ############
-        # END student code
-        ############ 
-               
+        sensor_pos = np.ones((4, 1))
+        sensor_pos[0:3] = meas.z[0:3]
+        vehicle_pos = meas.sensor.sens_to_veh*sensor_pos
+
+        self.x = np.zeros((params.dim_state, 1))
+        self.x[0:3] = vehicle_pos[0:3]
+
+        p_pos = M_rot * meas.R * M_rot.transpose()
+        p_vel = np.matrix([[params.sigma_p44**2, 0, 0],
+                           [0, params.sigma_p55**2, 0],
+                           [0, 0, params.sigma_p66**2]])
+
+        self.P = np.zeros((6, 6))
+        self.P[0:3, 0:3] = p_pos
+        self.P[3:6, 3:6] = p_vel
+
+        self.state = 'initialized'
+        self.score = 1 / params.window
+
         # other track attributes
         self.id = id
         self.width = meas.width
@@ -66,10 +66,10 @@ class Track:
         self.x = x
         
     def set_P(self, P):
-        self.P = P  
+        self.P = P
         
     def set_t(self, t):
-        self.t = t  
+        self.t = t
         
     def update_attributes(self, meas):
         # use exponential sliding average to estimate dimensions and orientation
@@ -107,13 +107,14 @@ class Trackmanagement:
             if meas_list: # if not empty
                 if meas_list[0].sensor.in_fov(track.x):
                     # your code goes here
-                    pass 
+                    track.score -= 1. / params.window
 
-        # delete old tracks   
-
-        ############
-        # END student code
-        ############ 
+        # delete old tracks
+        for track in self.track_list:
+            if (track.state == "confirmed" and track.score < params.delete_threshold) or \
+               ((track.state == 'initialized' or track.state == 'tentative') and track.score<1./params.window) or \
+               (track.P[0, 0] > params.max_P or track.P[1, 1] > params.max_P):
+                    self.delete_track(track)
             
         # initialize new track with unassigned measurement
         for j in unassigned_meas: 
@@ -134,14 +135,14 @@ class Trackmanagement:
         self.track_list.remove(track)
         
     def handle_updated_track(self, track):      
-        ############
-        # TODO Step 2: implement track management for updated tracks:
         # - increase track score
         # - set track state to 'tentative' or 'confirmed'
-        ############
+        tentative_threshold = 0.2
+        track.score += (1./params.window)
+        if track.score > 1.0:
+            track.score = 1.0
+        if track.state == 'tentative' and track.score > params.confirmed_threshold:
+            track.state = 'confirmed'
+        elif track.state == 'initialized' and track.score > tentative_threshold:
+            track.state = 'tentative'
 
-        pass
-        
-        ############
-        # END student code
-        ############ 
