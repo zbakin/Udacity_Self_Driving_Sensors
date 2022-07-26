@@ -4,28 +4,39 @@ Please use this starter template to answer the following questions:
 
 ### 1. Write a short recap of the four tracking steps and what you implemented there (filter, track management, association, camera fusion). Which results did you achieve? Which part of the project was most difficult for you to complete, and why?
 The final project involved implementing Extended Kalman Filter, track management, data association and fusion of the lidar and camera sensors.
-## Extended Kalman Filter
+# Extended Kalman Filter
 EKF mainly consists of 2 steps - prediction of the next step and update with new measurement. Prediction allows to roughly estimate the next position of the tracking object. The update step improves the confidence of tracking.
 For predict(), system matrix F and noise covariance Q needed to be implemented.
 For update(), gamma residual and S residual covariance were needed.
 The achieved result was the RMSE mean value of 0.30.
+
 <img src="img/step1.png"/><br />
 
-## Track Management
+<img src="img/step1_1.png"/><br />
+
+# Track Management
 Track management step allows to initialise, delete tracks, set a track state and score.
 In the first step, initialise, a new track is created for the new object. Deletion of track is accomplished by removing the confirmed track if the conditions are satisfied. Updating track state involves transiting between initialised, tentative and confirmed states. Updating track score is done by either increasing or decreasing the confidence score of the object.
 Final RMSE is 0.78.
 
-## Association
+<img src="img/step2.png"/><br />
+
+# Association
 In this step, a multi-target tracking is accomplished. Each measurement will be associated with the relevant track by means of a single nearest neighbor data association. 
 The association step is done by initialising an association matrix based on Mahalanobis distance formula. Gating functionality would check whether the measurement lies inside a track's gate. The algorithm of single nearest neighbor is implemented by finding the minimum entry in association matrix, deleting corresponsing row and column, assigning a measurement to relevant track and returning the track measurement pair. 
 As a result, 3 vehicles were identified and confirmed, and the maximum RMSEs of 3 tracks was 0.19.
 
-## Camera Fusion
+<img src="img/step3.png"/><br />
+
+<img src="img/step3_1.png"/><br />
+
+# Camera Fusion
 The final part of the project is to fuse camera and lidar measurements.
 First, the algorithm checks if the object is in the field of sensor view. It is required to transform the vehicle position coordinates to camera coordinates. Next, projection from camera to image coordinates is needed.
 Camera measurement object has to be initialised using vector z, noise covariance R. By the end, there were 3 confirmed tracks identified with the maximum RMSE of 0.17, which is better than in previous step.
 Last part of the project was the most difficult due to non obvious enabling the camera measurements. 
+
+<img src="img/step4.png"/><br />
 
 ### 2. Do you see any benefits in camera-lidar fusion compared to lidar-only tracking (in theory and in your concrete results)? 
 There is a benefit in using camera-lidar fusion due to faster confirmation time. The track confidence score increases faster when camera and lidar are used. Furthermore, this helps to ignore false detections quicker. 
