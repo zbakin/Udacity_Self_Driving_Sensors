@@ -9,6 +9,7 @@ EKF mainly consists of 2 steps - prediction of the next step and update with new
 For predict(), system matrix F and noise covariance Q needed to be implemented.
 For update(), gamma residual and S residual covariance were needed.
 The achieved result was the RMSE mean value of 0.30.
+<img src="img/step1.png"/><br />
 
 ## Track Management
 Track management step allows to initialise, delete tracks, set a track state and score.
